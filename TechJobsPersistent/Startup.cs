@@ -5,9 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TechJobsPersistent.Data;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace TechJobsPersistent
 {
@@ -24,6 +29,29 @@ namespace TechJobsPersistent
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddRazorPages();
+            services.AddAuthorization(
+            );
+            IServiceCollection serviceCollections = services.AddDbContextPool<JobDbContext>(
+                dbContextOptions => dbContextOptions
+                    .UseMySql(
+                        // Replace with your connection string.
+                        "server=localhost;userid=techjobs;password=techjobs;database=techjobs;",
+                        // Replace with your server version and type.
+                        // For common usages, see pull request #1233.
+                        new MySqlServerVersion(new Version(8, 0, 21)),
+                        // use MariaDbServerVersion for MariaDB
+                        mySqlOptions => mySqlOptions
+                            .CharSetBehavior(CharSetBehavior.NeverAppend)));
+
+            /*services.AddControllersWithViews();
+            services.AddDbContext<JobDbContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+            services.AddDbContext<JobDbContext>(options =>
+                options.UseMySql(
+                    connectionString,                             // <-- set the connection string to use by Pomelo
+                    ServerVersion.AutoDetect(connectionString))); // <-- auto detect the server version using a connection string*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
